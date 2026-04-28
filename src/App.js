@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
-const API = "http://localhost:8082/api";
 
+const API = "https://the-honors-vault-backend.onrender.com/api";
 // Unique ID generator - outside component, never resets
 let _uid = 0;
 const uid = () => `${++_uid}-${Date.now()}`;
