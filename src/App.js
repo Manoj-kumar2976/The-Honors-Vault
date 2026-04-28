@@ -77,8 +77,14 @@ function makeCaptcha() {
 
 // ─── APP ──────────────────────────────────────────────────
 export default function App() {
-  const [page, setPage]         = useState("login");
-  const [user, setUser]         = useState(null);
+const [user, setUser] = useState(() => {
+  const savedUser = localStorage.getItem("user");
+  return savedUser ? JSON.parse(savedUser) : null;
+});
+
+const [page, setPage] = useState(() => {
+  return localStorage.getItem("user") ? "dashboard" : "login";
+});
   const [achievements, setAch]  = useState([]);
   const [users, setUsers]       = useState([]);
   const [payments, setPay]      = useState([]);
@@ -94,11 +100,14 @@ export default function App() {
   }, [user]);
 
   const handleLogin = async (email, password) => {
-    const u = await post("/auth/login", { email, password });
-    setUser(u);
-    setPage("dashboard");
-    toast.success(`Welcome, ${u.name}!`);
-  };
+  const u = await post("/auth/login", { email, password });
+
+  localStorage.setItem("user", JSON.stringify(u));
+
+  setUser(u);
+  setPage("dashboard");
+  toast.success(`Welcome, ${u.name}!`);
+};
 
   const handleSignup = async (data) => {
     await post("/auth/signup", data);
@@ -107,11 +116,12 @@ export default function App() {
   };
 
   const handleLogout = () => {
-    setUser(null);
-    setUsers([]);
-    setPage("login");
-  };
+  localStorage.removeItem("user");
 
+  setUser(null);
+  setUsers([]);
+  setPage("login");
+};
   const addAch = async (data) => {
     const saved = await post("/achievements", data);
     setAch(p => [...p, saved]);
